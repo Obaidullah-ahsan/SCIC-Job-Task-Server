@@ -27,7 +27,12 @@ async function run() {
     const productsCollection = client.db("SCIC_Task").collection("products");
 
     app.get("/products", async (req, res) => {
-      const result = await productsCollection.find().toArray();
+      const searchText = req.query.search;
+      let searchQuery = {
+        Product_Name: { $regex: searchText, $options: "i" },
+      };
+      const cursor = productsCollection.find(searchQuery);
+      const result = await cursor.toArray();
       res.send(result);
     });
 
