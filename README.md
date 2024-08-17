@@ -23,7 +23,7 @@ This is the backend part of the UrbanCart is a full-stack, single-page e-commerc
 npm install
 # this will create node_modules folder and package-lock.json
 nodemon index.js
-# it will start your react app
+# it will start your server
 ```
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
