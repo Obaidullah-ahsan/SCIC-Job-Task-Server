@@ -27,13 +27,61 @@ async function run() {
     const productsCollection = client.db("SCIC_Task").collection("products");
 
     app.get("/products", async (req, res) => {
-      const searchText = req.query.search;
-      let searchQuery = {
-        Product_Name: { $regex: searchText, $options: "i" },
-      };
-      const cursor = productsCollection.find(searchQuery);
-      const result = await cursor.toArray();
-      res.send(result);
+      try {
+        // all things here
+        const {
+          page = 1,
+          limit = 10,
+          search = "",
+          brand,
+          category,
+          minPrice,
+          maxPrice,
+          sortBy,
+          sortOrder = "asc",
+        } = req.query;
+
+        // Build the query object for filtering
+        let query = {};
+
+        if (search) {
+          query.Product_Name = { $regex: search, $options: "i" };
+        }
+        if (brand) {
+          query.Brand = brand;
+        }
+        if (category) {
+          query.Category = category;
+        }
+        if (minPrice && maxPrice) {
+          query.Price = {
+            $gte: parseFloat(minPrice),
+            $lte: parseFloat(maxPrice),
+          };
+        }
+
+
+        // Pagination options
+        const skip = (page - 1) * limit;
+
+        const products = await productsCollection
+          .find(query)
+          .sort(sortOptions)
+          .skip(skip)
+          .limit(parseInt(limit))
+          .toArray();
+
+        const totalProducts = await productsCollection.countDocuments(query);
+
+        res.send({
+          products,
+          totalProducts,
+          totalPages: Math.ceil(totalProducts / limit),
+          currentPage: parseInt(page),
+        });
+      } catch (error) {
+        res.status(500).send({ message: "Error fetching products", error });
+      }
     });
 
     // Send a ping to confirm a successful connection
