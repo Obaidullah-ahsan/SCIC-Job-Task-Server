@@ -53,7 +53,12 @@ async function run() {
         if (category) {
           query.Category = category;
         }
-        
+        if (minPrice && maxPrice) {
+          query.Price = {
+            $gte: parseFloat(minPrice),
+            $lte: parseFloat(maxPrice),
+          };
+        }
         
         // Sorting options
         let sortOptions = {};
