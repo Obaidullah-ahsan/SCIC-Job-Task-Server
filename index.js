@@ -59,7 +59,14 @@ async function run() {
             $lte: parseFloat(maxPrice),
           };
         }
-
+        
+        // Sorting options
+        let sortOptions = {};
+        if (sortBy) {
+          sortOptions[sortBy] = sortOrder === "asc" ? 1 : -1;
+        } else {
+          sortOptions["creationDate"] = -1;
+        }
 
         // Pagination options
         const skip = (page - 1) * limit;
